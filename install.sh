@@ -312,32 +312,11 @@ udevadm control --reload-rules
 udevadm trigger --subsystem-match=input
 
 # Prima provisioning, poi grafica. Non riavviare il Raspberry automaticamente.
+# Il controller gestisce successivamente le transizioni app/offline.
+# Non attendiamo la stabilizzazione di Cage/Chromium né dipendiamo dalla rete.
+say 'Avvio dei servizi'
 systemctl start kiosk-wifi.service
 systemctl start --no-block kiosk.service
-# Il controller Wi-Fi può riavviare kiosk.service durante il cambio modalità.
-# Attendere uno stato stabile, verificando anche il processo Chromium effettivo.
-say 'Attesa avvio stabile di Cage/Chromium (massimo 60 secondi)'
-KIOSK_READY=false
-KIOSK_STABLE=0
-for ((attempt=1; attempt<=60; attempt++)); do
-    if systemctl is-active --quiet kiosk-wifi.service \
-        && systemctl is-active --quiet kiosk.service \
-        && pgrep -u kiosk -f '^/usr/lib/chromium/chromium( |$)' >/dev/null 2>&1; then
-        ((KIOSK_STABLE+=1))
-        if ((KIOSK_STABLE >= 5)); then
-            KIOSK_READY=true
-            break
-        fi
-    else
-        KIOSK_STABLE=0
-    fi
-    sleep 1
-done
-
-if [[ "$KIOSK_READY" != true ]]; then
-    journalctl -u kiosk-wifi.service -u kiosk.service -n 70 --no-pager >&2 || true
-    die 'Cage/Chromium non risultano stabilmente avviati entro il timeout.'
-fi
 
 say 'Installazione completata'
 printf 'Hostname/SSID  : %s\n' "$SSID"
