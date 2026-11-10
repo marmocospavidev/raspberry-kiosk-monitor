@@ -55,7 +55,7 @@ Dopo il riavvio, ricollegarsi via SSH.
 ```bash
 sudo apt-get install -y git
 
-git clone https://github.com/OWNER/REPOSITORY.git raspberry-kiosk
+git clone https://github.com/marmocospavidev/raspberry-kiosk-monitor.git raspberry-kiosk
 cd raspberry-kiosk
 sudo bash install.sh
 ```
@@ -67,8 +67,8 @@ Sostituire `OWNER/REPOSITORY` con il percorso effettivo del repository GitHub.
 Per un repository pubblico è possibile scaricare soltanto il bootstrap e lasciare che sia lui a clonare il progetto e avviare `install.sh`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/OWNER/REPOSITORY/main/bootstrap.sh -o /tmp/kiosk-bootstrap.sh \
-  && bash /tmp/kiosk-bootstrap.sh https://github.com/OWNER/REPOSITORY.git
+curl -fsSL https://raw.githubusercontent.com/marmocospavidev/raspberry-kiosk-monitor/main/bootstrap.sh -o /tmp/kiosk-bootstrap.sh \
+  && bash /tmp/kiosk-bootstrap.sh https://github.com/marmocospavidev/raspberry-kiosk-monitor.git
 ```
 
 Il bootstrap non richiede di copiare manualmente il repository sul Raspberry. In un repository privato è necessario predisporre l'autenticazione GitHub per `git clone` e usare il metodo standard o l'URL SSH.
