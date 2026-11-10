@@ -128,3 +128,67 @@ raspberry-kiosk/
 `kiosk-replica.tar.gz` è il pacchetto applicativo standard distribuito insieme all'installer. Durante l'installazione viene validato ed estratto **senza sostituzioni di testo né modifiche ai suoi sorgenti**.
 
 Se il repository è pubblico, verificare prima della pubblicazione che l'archivio non contenga credenziali, profili Wi-Fi salvati o altri dati riservati.
+
+## Modifica dell'URL dopo l'installazione
+
+È possibile modificare in qualsiasi momento l'URL visualizzato da Chromium in modalità Kiosk, senza reinstallare il sistema e senza riavviare il Raspberry Pi.
+
+### 1. Modificare la configurazione
+
+Accedere al Raspberry Pi tramite SSH e aprire il file di configurazione:
+
+```bash
+sudo nano /etc/kiosk/kiosk.env
+```
+
+Individuare la variabile `KIOSK_URL` e impostare il nuovo indirizzo:
+
+```ini
+KIOSK_URL=https://dashboard.example.com
+```
+
+Salvare con `CTRL+O`, confermare con `INVIO` e uscire con `CTRL+X`.
+
+### 2. Applicare la modifica
+
+Riavviare il servizio Kiosk:
+
+```bash
+sudo systemctl restart kiosk.service
+```
+
+Chromium verrà riavviato automaticamente e caricherà il nuovo URL.
+
+Non è necessario riavviare il Raspberry Pi.
+
+### 3. Verificare la configurazione
+
+Visualizzare l'URL configurato:
+
+```bash
+sudo grep '^KIOSK_URL=' /etc/kiosk/kiosk.env
+```
+
+Verificare lo stato del servizio:
+
+```bash
+sudo systemctl status kiosk.service --no-pager
+```
+
+In caso di problemi, consultare i log:
+
+```bash
+sudo journalctl -u kiosk.service -n 50 --no-pager
+```
+
+### Comportamento in assenza di URL
+
+Se `KIOSK_URL` non è definita oppure è vuota, Chromium utilizza la pagina locale di fallback:
+
+```text
+file:///opt/kiosk-wifi/error_url.html
+```
+
+Questo comportamento richiede che il launcher `kiosk-browser` sia configurato con il relativo fallback.
+
+**Nota:** modificare soltanto la variabile `KIOSK_URL`, mantenendo inalterate eventuali altre impostazioni presenti nel file `/etc/kiosk/kiosk.env`.
